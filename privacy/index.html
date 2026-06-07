@@ -38,7 +38,7 @@
   <!-- ===================== 日本語 ===================== -->
   <section id="ja">
     <h1>プライバシーポリシー</h1>
-    <div class="updated">最終更新日：2026年5月30日<br>適用アプリ：パシャレピ（Pasha Recipe）（以下「本アプリ」）</div>
+    <div class="updated">最終更新日：2026年6月7日<br>適用アプリ：パシャレピ（Pasha Recipe）（以下「本アプリ」）</div>
 
     <p>本アプリの開発・運営者（以下「当方」）は、ユーザーのプライバシーを尊重し、本アプリで取り扱う情報について以下の方針に基づいて管理します。</p>
 
@@ -58,8 +58,8 @@
     <ul>
       <li>ユーザーが冷蔵庫内を撮影した写真、またはフォトライブラリから選択した写真</li>
       <li><strong>写真自体は本アプリ内に保存されません。</strong></li>
-      <li>食材認識のため、AI処理サービス（後述）へ一時的に送信されます。</li>
-      <li>認識処理完了後、当方およびAI処理サービス側でも保存されません。</li>
+      <li>食材認識のため、当方の中継サーバー（プロキシ。後述「4. データの保管と保護」）を経由してAI処理サービス（後述）へ一時的に送信されます。</li>
+      <li>写真は中継サーバーを<strong>通過するだけで保存されません</strong>。認識処理完了後、当方・中継サーバー・AI処理サービスのいずれにも保存されません。</li>
     </ul>
 
     <h3>1.3 課金情報</h3>
@@ -132,10 +132,36 @@
     </ul>
 
     <h2>4. データの保管と保護</h2>
+
+    <h3>4.1 端末内のデータ</h3>
     <ul>
-      <li>食材リスト・お気に入り・常備調味料・希望テキストは、端末のiOS標準 <code>UserDefaults</code> に保存されます。アプリを削除すると自動的に消去されます。当方のサーバーには一切送信・保存されません。</li>
-      <li>当方は独自サーバーを運営していません。Anthropic・RevenueCat各社のセキュリティ基準（SOC 2等）に準拠した保管が行われます。</li>
-      <li>アプリとAIサービス間のすべての通信はHTTPS（TLS 1.2以上）で暗号化されます。</li>
+      <li>食材リスト・お気に入り・常備調味料・希望テキストは、端末のiOS標準 <code>UserDefaults</code> に保存されます。アプリを削除すると自動的に消去されます。</li>
+      <li>これらの端末内データ（食材リスト・お気に入り等）が当方サーバーに送信・保存されることはありません。</li>
+    </ul>
+
+    <h3>4.2 当方の中継サーバー（プロキシ）</h3>
+    <p>当方は、AI処理サービスへの安全な接続のために中継サーバー（プロキシ）を運営しています（基盤：Cloudflare Workers／米国・グローバルエッジ）。これはAPIキーをアプリに埋め込まず保護し、不正利用を防ぐための仕組みです。</p>
+    <ul>
+      <li><strong>写真・リクエスト内容</strong>：AI処理サービスへ<strong>通過させるだけで保存しません</strong>。</li>
+      <li><strong>保存する情報（個人を特定しない匿名データのみ）</strong>：
+        <ul>
+          <li>端末の匿名認証鍵（Apple App Attestの公開鍵）— 正規アプリ・正規端末からの利用であることの確認用</li>
+          <li>利用回数のカウント（無料枠／有料枠の残量管理用）</li>
+          <li>RevenueCatの匿名ユーザーID（有料判定のため一時的にキャッシュ）</li>
+        </ul>
+      </li>
+      <li><strong>目的</strong>：APIキーの保護、無料／有料プランの利用回数の管理、不正利用（乱用）の防止</li>
+      <li>上記はいずれも氏名・連絡先等と紐付かず、<strong>ユーザー個人を特定しません</strong>。基盤事業者Cloudflareのセキュリティ基準（SOC 2等）に準拠して保管されます。</li>
+    </ul>
+
+    <h3>4.3 第三者サービス側のデータ</h3>
+    <ul>
+      <li>Anthropic・RevenueCat各社のセキュリティ基準（SOC 2等）に準拠した保管が行われます。</li>
+    </ul>
+
+    <h3>4.4 通信の暗号化</h3>
+    <ul>
+      <li>アプリ ↔ 当方の中継サーバー ↔ AIサービス間のすべての通信はHTTPS（TLS 1.2以上）で暗号化されます。</li>
     </ul>
 
     <h2>5. ユーザーの権利</h2>
@@ -166,7 +192,7 @@
   <!-- ===================== English ===================== -->
   <section id="en">
     <h1>Privacy Policy</h1>
-    <div class="updated">Last Updated: May 30, 2026<br>App: Pasha Recipe (パシャレピ) ("the App")</div>
+    <div class="updated">Last Updated: June 7, 2026<br>App: Pasha Recipe (パシャレピ) ("the App")</div>
 
     <p>The developer and operator of this App ("We") respects your privacy. This policy explains how we handle information related to the App.</p>
 
@@ -183,8 +209,9 @@
 
     <h3>1.2 Photos</h3>
     <ul>
-      <li>Photos you take of your fridge or select from your photo library are sent temporarily to our AI provider (see Section 3) for ingredient recognition.</li>
-      <li><strong>Photos are not stored</strong> in the App, on our servers, or by the AI provider after processing.</li>
+      <li>Photos you take of your fridge or select from your photo library are sent temporarily&mdash;via our relay proxy server (see Section 4)&mdash;to our AI provider (see Section 3) for ingredient recognition.</li>
+      <li>Photos only <strong>pass through</strong> the relay proxy and are not stored there.</li>
+      <li><strong>Photos are not stored</strong> in the App, on our servers/proxy, or by the AI provider after processing.</li>
     </ul>
 
     <h3>1.3 Purchase Information</h3>
@@ -251,10 +278,35 @@
     </ul>
 
     <h2>4. Data Storage and Protection</h2>
+
+    <h3>4.1 On-device data</h3>
     <ul>
-      <li>All on-device data is stored in iOS <code>UserDefaults</code> and removed when the App is uninstalled. It is never sent to or stored on our servers.</li>
-      <li>We do not operate our own servers. Storage follows the security standards (e.g., SOC 2) of Anthropic and RevenueCat.</li>
-      <li>All communication with AI services is encrypted via HTTPS (TLS 1.2+).</li>
+      <li>All on-device data (ingredient lists, favorites, etc.) is stored in iOS <code>UserDefaults</code> and removed when the App is uninstalled; it is never sent to or stored on our servers.</li>
+    </ul>
+
+    <h3>4.2 Our relay proxy server</h3>
+    <p>We operate a relay proxy server (built on Cloudflare Workers; United States / global edge) to securely connect to the AI provider without embedding API keys in the App and to prevent abuse.</p>
+    <ul>
+      <li><strong>Photos and request contents only pass through</strong> the proxy and are <strong>not stored</strong>.</li>
+      <li>We store only the following <strong>anonymous, non-identifying</strong> data:
+        <ul>
+          <li>An anonymous device attestation public key (Apple App Attest) — to verify a genuine app on a genuine device</li>
+          <li>Usage counters — to enforce free/paid tier limits</li>
+          <li>The anonymous RevenueCat user ID — cached briefly for entitlement checks</li>
+        </ul>
+      </li>
+      <li><strong>Purpose</strong>: protecting API keys, enforcing usage limits, and preventing abuse</li>
+      <li>None of this is linked to your name or contact details and does not identify you personally. Stored in accordance with Cloudflare's security standards (SOC 2, etc.).</li>
+    </ul>
+
+    <h3>4.3 Third-party storage</h3>
+    <ul>
+      <li>Storage follows the security standards (e.g., SOC 2) of Anthropic and RevenueCat.</li>
+    </ul>
+
+    <h3>4.4 Encryption</h3>
+    <ul>
+      <li>All communication (App ↔ our relay proxy ↔ AI services) is encrypted via HTTPS (TLS 1.2+).</li>
     </ul>
 
     <h2>5. Your Rights</h2>
